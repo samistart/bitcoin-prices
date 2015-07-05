@@ -1,0 +1,31 @@
+<!DOCTYPE HTML>
+<html lang="en" ng-app="myApp">
+<head>
+    <script src="lib/angular.min.js"></script>
+    <script src="lib/canvasjs.min.js"></script>
+    <script src="js/controllers.js"></script>
+    <!-- Bootstrap -->
+    <link href="lib/bootstrap-3.3.5-dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div>
+<div ng-controller="MyController">
+    <div class="search">
+        <h1>Date Range</h1>
+        <input type="date" ng-model="query">
+    </div>
+    <table>
+        <tr>
+            <th>Month</th>
+            <th>Savings</th>
+        </tr>
+        <tr ng-repeat="(key, value) in prices">
+            <td>{{key | date:'medium'}}</td>
+            <td>{{value}}</td>
+        </tr>
+    </table>
+</div>
+</div>
+<script src="lib/bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
+</body>
+</html>
