@@ -1,12 +1,13 @@
 /**
  * Created by samistart on 04/07/15.
  */
-var myApp = angular.module('myApp', []);
+var pricesControllers = angular.module('pricesControllers', []);
 
-myApp.controller('MyController', function($scope, $http, $routeParams){
-    $routeParams.startDate = '2013-09-01';
+pricesControllers.controller('MyController', function($scope, $http){
 
-    var startDate = '2013-09-01';
+    var startDate = '2015-07-01';
+    //I want to bind the start and end dates to the input fields so that the list automatically changes
+    $http.startDate = startDate;
     var endDate = new Date();
     $scope.day = endDate.getDate();
     $scope.month = endDate.getMonth()+1; //January is 0!
@@ -21,22 +22,18 @@ myApp.controller('MyController', function($scope, $http, $routeParams){
     }
 
     endDate = $scope.year+'-'+$scope.month+'-'+$scope.day;
+    $http.endDate = endDate;
 
-    $routeParams.endDate = endDate;
 
     console.log(endDate);
-    var getUrl = "https://api.coindesk.com/v1/bpi/historical/close.json?start=" + $routeParams.startDate + "&end=" + $routeParams.endDate;
+    var getUrl = "https://api.coindesk.com/v1/bpi/historical/close.json";
     // Simple GET request example :
-    $http.get(getUrl).
+    $http.get(getUrl, {params : {start : startDate, end : endDate}}).
         success(function(data) {
             $scope.prices = data.bpi;
         });
 
-
-
-    console.log($scope.prices);
-
-
 });
+
 
 
