@@ -11,9 +11,10 @@ myApp.controller('PricesController', ['$scope', '$http',
 
 
         $scope.endDate = new Date();
-        $scope.startDate = new Date("2015/06/07");
+        $scope.startDate = new Date("2015/06/25");
         $scope.currency = "EUR";
 
+        //process date to format needed by Coinbase API
         function processDate(myDate) {
             var day = myDate.getDate();
             var month = myDate.getMonth()+1; //January is 0!
@@ -32,7 +33,7 @@ myApp.controller('PricesController', ['$scope', '$http',
 
 
 
-
+        //called on load and on click of button in html
         $scope.getData = function getData() {
 
             var startDateString = processDate($scope.startDate);
@@ -49,7 +50,7 @@ myApp.controller('PricesController', ['$scope', '$http',
 
 
             var getUrl = "https://api.coindesk.com/v1/bpi/historical/close.json";
-            // Simple GET request example :
+            // GET parameters are bound to user input :
             $http.get(getUrl, {params : {start : startDateString, end : endDateString, currency : $scope.currency}}).
                 success(function(data) {
                     $scope.prices = data.bpi;
