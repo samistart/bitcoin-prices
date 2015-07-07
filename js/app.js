@@ -3,18 +3,18 @@
  */
 
 var myApp = angular.module('myApp', [
-    "chart.js"
+    'n3-line-chart'
 ]);
 
 myApp.controller('PricesController', ['$scope', '$http',
     function($scope, $http){
 
-
-        $scope.endDate = new Date();
-        $scope.startDate = new Date("2015/06/25");
+        $scope.today = new Date();
+        $scope.endDate = $scope.today;
+        $scope.startDate = new Date("2015/06/07");
         $scope.currency = "EUR";
+        $scope.errorMessage = 'all good';
 
-        //process date to format needed by Coinbase API
         function processDate(myDate) {
             var day = myDate.getDate();
             var month = myDate.getMonth()+1; //January is 0!
@@ -33,91 +33,71 @@ myApp.controller('PricesController', ['$scope', '$http',
 
 
 
-        //called on load and on click of button in html
+
         $scope.getData = function getData() {
+
+            if ($scope.startDate > $scope.endDate ||
+                $scope.endDate > (new Date())){
+                $scope.errorMessage = "Invalid date input";
+                return;
+            }
+            else{
+                $scope.errorMessage = "";
+            }
 
             var startDateString = processDate($scope.startDate);
             var endDateString = processDate($scope.endDate);
 
             $scope.displayCurrency = $scope.currency;
 
-            $scope.labels = [];
-            $scope.series = [''];
-            $scope.data = [[]];
+            var data = [];
+            $scope.data = [];
             $scope.onClick = function (points, evt) {
                 console.log(points, evt);
             };
 
 
             var getUrl = "https://api.coindesk.com/v1/bpi/historical/close.json";
-            // GET parameters are bound to user input :
+            // Simple GET request example :
             $http.get(getUrl, {params : {start : startDateString, end : endDateString, currency : $scope.currency}}).
                 success(function(data) {
-                    $scope.prices = data.bpi;
                     var points = data.bpi;
+                    var data = [];
 
                     for (var key in points) {
                         if (points.hasOwnProperty(key)) {
-                            $scope.labels.push(key);
-                            $scope.data[0].push(points[key]);
+                            data.push({x: new Date(key), value: points[key]});
                         }
                     }
+                    console.log(data);
+                    $scope.data = data;
 
 
                 });
+
 
         }
 
         $scope.getData();
 
-
         $scope.options = {
-
-            ///Boolean - Whether grid lines are shown across the chart
-            scaleShowGridLines : true,
-
-            //String - Colour of the grid lines
-            scaleGridLineColor : "rgba(0,0,0,.05)",
-
-            //Number - Width of the grid lines
-            scaleGridLineWidth : 1,
-
-            //Boolean - Whether to show horizontal lines (except X axis)
-            scaleShowHorizontalLines: true,
-
-            //Boolean - Whether to show vertical lines (except Y axis)
-            scaleShowVerticalLines: true,
-
-            //Boolean - Whether the line is curved between points
-            bezierCurve : true,
-
-            //Number - Tension of the bezier curve between points
-            bezierCurveTension : 0.4,
-
-            //Boolean - Whether to show a dot for each point
-            pointDot : true,
-
-            //Number - Radius of each point dot in pixels
-            pointDotRadius : 4,
-
-            //Number - Pixel width of point dot stroke
-            pointDotStrokeWidth : 1,
-
-            //Number - amount extra to add to the radius to cater for hit detection outside the drawn point
-            pointHitDetectionRadius : 20,
-
-            //Boolean - Whether to show a stroke for datasets
-            datasetStroke : true,
-
-            //Number - Pixel width of dataset stroke
-            datasetStrokeWidth : 2,
-
-            //Boolean - Whether to fill the dataset with a colour
-            datasetFill : true,
-
-            //String - A legend template
-            legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].strokeColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>"
-
+            axes: {
+                x: {
+                    key: "x",
+                    type: 'date'
+                },
+                y: {
+                    type: "linear"
+                }
+            },
+            series: [
+                {
+                    y: "value",
+                    label: "Bitcoin prices in " + $scope.displayCurrency,
+                    color: "#ff7f0e",
+                    type: 'area'
+                }
+            ]
         };
 
 
